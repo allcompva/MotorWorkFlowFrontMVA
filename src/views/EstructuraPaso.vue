@@ -1,0 +1,227 @@
+<template>
+  <div>
+    <Header style="margin-top: 0px"></Header>
+  </div>
+  <div class="container" style="margin-top: 40px; background-color: white">
+    <CRow
+      style="margin-bottom: 5px; background-color: white; position: relative"
+    >
+      <CCol xs="12" style="display: contents">
+        <h2>Paso a paso en vecino</h2>
+        <CButton
+          @click="abreModalTramite(null)"
+          style="float: right; right: 25px; position: absolute"
+          class="btn btn-primary"
+          ><span class="fa fa-plus-circle"></span>&nbsp;&nbsp;Nueva
+          Pestaña</CButton
+        >
+      </CCol>
+    </CRow>
+    <CRow
+      style="margin-bottom: 45px; background-color: white; position: relative"
+    >
+      <CCol xs="12">
+        <table id="example" class="display nowrap" style="width: 100%">
+          <tbody
+            v-if="lstPasos != null && lstPasos != 'undefined'"
+            style="
+              border-style: solid;
+              border-width: 1px;
+              border-left: none;
+              border-right: none;
+              border-color: #d3d0d0;
+            "
+          >
+            <tr style="border-bottom: solid 1px lightgray">
+              <td>
+                <p style="margin-top: 20px"><strong>NOMBRE</strong></p>
+              </td>
+              <td></td>
+            </tr>
+            <tr v-for="(item, index) in lstPasos" :key="index">
+              <td
+                style="padding-top: 0px; border-top: none; padding-bottom: 0px"
+              >
+                <p
+                  class="text-medium-emphasis"
+                  style="
+                    margin-bottom: 0px;
+                    padding-top: 10px;
+                    color: #505050 !important;
+                  "
+                ></p>
+                <P style="color: #505050 !important">{{ item.nombre }} </P>
+              </td>
+              <td
+                style="
+                  padding-top: 0px;
+                  border-top: none;
+                  padding-bottom: 0px;
+                  text-align: right;
+                "
+              >
+                <CButtonGroup role="group" aria-label="Default button group">
+                  <CButton
+                    ><span
+                      class="fa fa-edit"
+                      @click="abreModalTramite(item)"
+                    ></span
+                  ></CButton>
+                  <CButton
+                    ><span
+                      class="fa fa-cog"
+                      @click="doSomething(item.id)"
+                    ></span
+                  ></CButton>
+                  <CButton><span class="fa fa-eye"></span></CButton>
+                </CButtonGroup>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </CCol>
+    </CRow>
+  </div>
+  <CModal
+    backdrop="static"
+    :visible="modalTramite"
+    @close="
+      () => {
+        modalTramite = false
+      }
+    "
+  >
+    <CModalHeader>
+      <CModalTitle>Crear / Administrar Paso a paso vecino</CModalTitle>
+    </CModalHeader>
+    <CModalBody>
+      <CRow>
+        <CCol cols="12">
+          <label style="margin-top: 10px">Nombre</label>
+          <CFormInput v-model="paso.titulo" required></CFormInput>
+        </CCol>
+      </CRow>
+    </CModalBody>
+    <CModalFooter>
+      <CButton
+        color="secondary"
+        @click="
+          () => {
+            modalTramite = false
+          }
+        "
+      >
+        Cancelar
+      </CButton>
+      <CButton @click="btnSave" color="primary">Guardar Cambios</CButton>
+    </CModalFooter>
+  </CModal>
+</template>
+<style>
+.modal.show .modal-dialog {
+  max-width: 60% !important;
+}
+@import '../assets/css/bootstrap.min.css';
+.row {
+  padding: 15px;
+}
+@import 'datatables.net-dt';
+</style>
+<script>
+import Header from '../components/Headers/AdminMunicipal.vue'
+import 'datatables.net-responsive'
+import axios from 'axios'
+//import $ from 'jquery'
+import 'datatables.net'
+import 'datatables.net-responsive'
+import Cookies from 'js-cookie'
+import { CButton, CCol } from '@coreui/vue-pro'
+import { useRoute } from 'vue-router'
+export default {
+  data: () => ({
+    paso: {
+      id: 0,
+      id_paso: 0,
+      titulo: '',
+      orden: 0,
+      activo: true,
+    },
+    id_paso: 0,
+    opcion: 0,
+  }),
+  components: {
+    Header,
+    CButton,
+    CCol,
+  },
+  mounted() {
+    try {
+      if (
+        Cookies.get('cod_usuario') == 'undefined' &&
+        Cookies.get('cod_oficina') == 'undefined'
+      ) {
+        this.$router.push('/')
+      }
+      const route = useRoute()
+      const id = route.params.id
+      this.id_paso = id
+      axios
+        .get('/Paso/getByPk?ID=' + id)
+        .then((response) => (this.lstPasos = response.data))
+      this.pantalla = window.innerWidth
+    } catch (error) {
+      alert(error)
+    }
+  },
+  methods: {
+    abreModalTramite(pas) {
+      if (pas != null) {
+        this.paso = pas
+        this.opcion = 2
+      } else {
+        this.opcion = 1
+        ;(this.paso.id = 0),
+          (this.paso.id_paso = this.id_paso),
+          (this.paso.titulo = ''),
+          (this.paso.orden = 0),
+          (this.paso.activo = true)
+      }
+      this.modalTramite = true
+    },
+    doSomething(id) {
+      this.$router.push('/EstructuraPaso/' + id)
+    },
+    async btnSave() {
+      try {
+        let InstFormData = new FormData()
+        this.paso.id_tramite = this.idTramite
+        if (this.paso.id_oficina == 0) this.paso.en_usuario = true
+        InstFormData.append('obj', this.paso)
+        if (this.opcion == 1) {
+          await axios
+            .post('/Paso/insert', { ...this.paso })
+            .then(
+              () =>
+                axios
+                  .get('/Paso/readBackEnd?idTramite=' + this.idTramite)
+                  .then((response) => (this.lstPasos = response.data)),
+              (this.modalTramite = false),
+            )
+        } else {
+          await axios
+            .post('/Paso/update', { ...this.paso })
+            .then(
+              () =>
+                axios
+                  .get('/Paso/readBackEnd?idTramite=' + this.idTramite)
+                  .then((response) => (this.lstPasos = response.data)),
+              (this.modalTramite = false),
+            )
+        }
+      } catch {
+        alert('Error')
+      }
+    },
+  },
+}
+</script>
