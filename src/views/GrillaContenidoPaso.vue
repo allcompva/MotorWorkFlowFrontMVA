@@ -7,7 +7,7 @@
       style="margin-bottom: 5px; background-color: white; position: relative"
     >
       <CCol xs="12" style="display: contents">
-        <h4>Grila Ingreso</h4>
+        <h4>Grilla Ingresos en paso</h4>
         <CButton
           @click="salir()"
           style="float: right; right: 25px; position: absolute"
@@ -187,15 +187,39 @@
           </CCol>
         </CRow>
       </CCol>
-      <CCol>
+      <CCol xs="8">
         <CRow
+          v-for="(pestania, indice) in paso.filter(
+            (filas, index, self) =>
+              index === self.findIndex((f) => f.row === filas.row),
+          )"
+          :key="indice"
           style="
-            min-height: 700px;
+            min-height: 100px;
             border: solid 1px lightgray;
             border-radius: 15px;
             margin: 15px;
           "
         >
+          <CRow>
+            <CCol cols="12" style="padding-top: 10px; padding-left: 20px"
+              >Fila de dos columnas</CCol
+            >
+          </CRow>
+          <CCol
+            style="
+              min-height: 100px;
+              border: solid 1px lightgray;
+              border-radius: 15px;
+              margin: 15px;
+              width: 29.5% !important;
+            "
+            :xs="itemCol.col"
+            v-for="(itemCol, ic) in paso.filter(
+              (columna) => columna.row === pestania.row,
+            )"
+            :key="ic"
+          ></CCol>
         </CRow>
       </CCol>
     </CRow>
@@ -207,19 +231,23 @@ import 'datatables.net-responsive'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { CButton, CCol } from '@coreui/vue-pro'
-//import { useRoute } from 'vue-router'
+import { useRoute } from 'vue-router'
 export default {
   data: () => ({
-    paso: {
-      id: 0,
-      id_paso: 0,
-      titulo: '',
-      orden: 0,
-      activo: true,
-    },
-    id_paso: 0,
+    paso: [
+      {
+        id: 0,
+        id_ingreso_paso: 0,
+        orden: 0,
+        row: 0,
+        col: 0,
+        activo: true,
+      },
+    ],
+    id_ingreso_paso: 0,
     opcion: 0,
     modalTramite: false,
+    arraySinRepetidos: [],
   }),
   components: {
     Header,
@@ -234,28 +262,20 @@ export default {
       ) {
         this.$router.push('/')
       }
+      const route = useRoute()
+      const id = route.params.id
+      this.id_ingreso_paso = id
+      axios
+        .get('/Contenido_ingreso_paso/read?id_ingreso_paso=' + id)
+        .then((response) => (this.paso = response.data))
       this.pantalla = window.innerWidth
     } catch (error) {
       alert(error)
     }
   },
   methods: {
-    abreModalTramite(pas) {
-      if (pas != null) {
-        this.paso = pas
-        this.opcion = 2
-      } else {
-        this.opcion = 1
-        ;(this.paso.id = 0),
-          (this.paso.id_paso = this.id_paso),
-          (this.paso.titulo = ''),
-          (this.paso.orden = 0),
-          (this.paso.activo = true)
-      }
-      this.modalTramite = true
-    },
     salir() {
-      this.$router.push('/ListaPaso/' + this.paso.id_tramite)
+      this.$router.push('/EstructuraPaso/' + this.paso.id_paso)
     },
     configura(id) {
       this.$router.push('/ListaPaso/' + id)
@@ -263,21 +283,15 @@ export default {
     async btnSave() {
       try {
         let InstFormData = new FormData()
+        this.paso.id = 0
         this.paso.id_paso = this.id_paso
+        this.paso.orden = 0
+        this.paso.activo = true
+
         InstFormData.append('obj', this.paso)
         if (this.opcion == 1) {
           await axios
             .post('/Ingresos_x_paso/insert', { ...this.paso })
-            .then(() =>
-              axios
-                .get('/Paso/getByPk?ID=' + this.id_paso)
-                .then((response) => (this.paso = response.data))(
-                (this.modalTramite = false),
-              ),
-            )
-        } else {
-          await axios
-            .post('/Ingresos_x_paso/update', { ...this.paso })
             .then(() =>
               axios
                 .get('/Paso/getByPk?ID=' + this.id_paso)
