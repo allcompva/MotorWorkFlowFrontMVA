@@ -30,6 +30,11 @@ const routes = [
         component: () => import('@/views/ListaPaso.vue'),
       },
       {
+        path: '/GrillaContenidoPaso/:id',
+        name: 'GrillaContenidoPaso',
+        component: () => import('@/views/GrillaContenidoPaso.vue'),
+      },
+      {
         path: '/EstructuraPaso/:id',
         name: 'EstructuraPaso',
         component: () => import('@/views/EstructuraPaso.vue'),

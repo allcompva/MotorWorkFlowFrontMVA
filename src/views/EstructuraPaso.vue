@@ -9,8 +9,14 @@
       <CCol xs="12" style="display: contents">
         <h2>Paso a paso en vecino</h2>
         <CButton
-          @click="abreModalTramite(null)"
+          @click="salir()"
           style="float: right; right: 25px; position: absolute"
+          class="btn btn-success"
+          ><span class="fa fa-chevron-left"></span>&nbsp;&nbsp;Salir
+        </CButton>
+        <CButton
+          @click="abreModalTramite(null)"
+          style="float: right; right: 125px; position: absolute"
           class="btn btn-primary"
           ><span class="fa fa-plus-circle"></span>&nbsp;&nbsp;Nueva
           Pestaña</CButton
@@ -23,7 +29,7 @@
       <CCol xs="12">
         <table id="example" class="display nowrap" style="width: 100%">
           <tbody
-            v-if="lstPasos != null && lstPasos != 'undefined'"
+            v-if="paso.lstIngresos != null && paso.lstIngresos != 'undefined'"
             style="
               border-style: solid;
               border-width: 1px;
@@ -38,7 +44,7 @@
               </td>
               <td></td>
             </tr>
-            <tr v-for="(item, index) in lstPasos" :key="index">
+            <tr v-for="(item, index) in paso.lstIngresos" :key="index">
               <td
                 style="padding-top: 0px; border-top: none; padding-bottom: 0px"
               >
@@ -50,7 +56,7 @@
                     color: #505050 !important;
                   "
                 ></p>
-                <P style="color: #505050 !important">{{ item.nombre }} </P>
+                <P style="color: #505050 !important">{{ item.titulo }} </P>
               </td>
               <td
                 style="
@@ -68,10 +74,7 @@
                     ></span
                   ></CButton>
                   <CButton
-                    ><span
-                      class="fa fa-cog"
-                      @click="doSomething(item.id)"
-                    ></span
+                    ><span class="fa fa-cog" @click="configura(item.id)"></span
                   ></CButton>
                   <CButton><span class="fa fa-eye"></span></CButton>
                 </CButtonGroup>
@@ -148,6 +151,7 @@ export default {
     },
     id_paso: 0,
     opcion: 0,
+    modalTramite: false,
   }),
   components: {
     Header,
@@ -167,7 +171,7 @@ export default {
       this.id_paso = id
       axios
         .get('/Paso/getByPk?ID=' + id)
-        .then((response) => (this.lstPasos = response.data))
+        .then((response) => (this.paso = response.data))
       this.pantalla = window.innerWidth
     } catch (error) {
       alert(error)
@@ -188,34 +192,36 @@ export default {
       }
       this.modalTramite = true
     },
-    doSomething(id) {
-      this.$router.push('/EstructuraPaso/' + id)
+    salir() {
+      this.$router.push('/ListaPaso/' + this.paso.id_tramite)
+    },
+    configura(id) {
+      this.$router.push('/GrillaContenidoPaso/' + id)
     },
     async btnSave() {
       try {
         let InstFormData = new FormData()
-        this.paso.id_tramite = this.idTramite
-        if (this.paso.id_oficina == 0) this.paso.en_usuario = true
+        this.paso.id_paso = this.id_paso
         InstFormData.append('obj', this.paso)
         if (this.opcion == 1) {
           await axios
-            .post('/Paso/insert', { ...this.paso })
-            .then(
-              () =>
-                axios
-                  .get('/Paso/readBackEnd?idTramite=' + this.idTramite)
-                  .then((response) => (this.lstPasos = response.data)),
-              (this.modalTramite = false),
+            .post('/Ingresos_x_paso/insert', { ...this.paso })
+            .then(() =>
+              axios
+                .get('/Paso/getByPk?ID=' + this.id_paso)
+                .then((response) => (this.paso = response.data))(
+                (this.modalTramite = false),
+              ),
             )
         } else {
           await axios
-            .post('/Paso/update', { ...this.paso })
-            .then(
-              () =>
-                axios
-                  .get('/Paso/readBackEnd?idTramite=' + this.idTramite)
-                  .then((response) => (this.lstPasos = response.data)),
-              (this.modalTramite = false),
+            .post('/Ingresos_x_paso/update', { ...this.paso })
+            .then(() =>
+              axios
+                .get('/Paso/getByPk?ID=' + this.id_paso)
+                .then((response) => (this.paso = response.data))(
+                (this.modalTramite = false),
+              ),
             )
         }
       } catch {
