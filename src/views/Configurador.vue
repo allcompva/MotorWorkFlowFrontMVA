@@ -119,9 +119,7 @@
     </div>
   </div>
 </template>
-<style scoped>
-@import '../assets/css/bootstrap.min.css';
-
+<style>
 .draggable-item {
   display: flex;
   justify-content: center;

@@ -56,8 +56,7 @@
     </div>
   </div>
 </template>
-<style scoped>
-@import '../assets/css/app.css';
+<style>
 .text-gray-600 {
   --bs-text-opacity: 1;
   color: rgba(var(--bs-gray-600-rgb), var(--bs-text-opacity)) !important;

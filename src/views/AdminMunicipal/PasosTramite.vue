@@ -545,7 +545,7 @@
     </CForm>
   </div>
 </template>
-<style scoped>
+<style>
 .form-wizard-vue .fw-overflow-scroll .fw-card {
   overflow-x: hidden !important;
 }

@@ -289,7 +289,7 @@
     </CModalBody>
   </CModal>
 </template>
-<style scoped>
+<style>
 .v-select.v-select--chips:not(
     .v-text-field--single-line
   ).v-text-field--box.v-input--dense

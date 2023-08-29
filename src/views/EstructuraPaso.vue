@@ -2,12 +2,40 @@
   <div>
     <Header style="margin-top: 0px"></Header>
   </div>
-  <div class="container" style="margin-top: 40px; background-color: white">
+  <div
+    class="container"
+    style="margin-top: 40px; background-color: white"
+    v-if="paso.lstIngresos != null && paso.lstIngresos != 'undefined'"
+  >
     <CRow
       style="margin-bottom: 5px; background-color: white; position: relative"
     >
       <CCol xs="12" style="display: contents">
-        <h2>Paso a paso en vecino</h2>
+        <p
+          style="
+            width: 100%;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 0;
+          "
+        >
+          {{ this.nombre_tramite }}
+        </p>
+        <p
+          style="
+            width: 100%;
+            font-size: 20px;
+            font-weight: 400;
+            margin-bottom: 0;
+          "
+        >
+          {{ this.nombre_unidad_organizativa }}
+        </p>
+        <p style="width: 100%"></p>
+        <hr style="width: 100%; margin-top: 0" />
+        <h2 v-if="paso.en_usuario" style="font-size: 24px; color: gray">
+          Paso a paso en vecino
+        </h2>
         <CButton
           @click="salir()"
           style="float: right; right: 25px; position: absolute"
@@ -15,6 +43,7 @@
           ><span class="fa fa-chevron-left"></span>&nbsp;&nbsp;Salir
         </CButton>
         <CButton
+          v-if="paso.en_usuario || paso.lstIngresos.length == 0"
           @click="abreModalTramite(null)"
           style="float: right; right: 125px; position: absolute"
           class="btn btn-primary"
@@ -24,17 +53,19 @@
       </CCol>
     </CRow>
     <CRow
-      style="margin-bottom: 45px; background-color: white; position: relative"
+      style="margin-bottom: 25px; background-color: white; position: relative"
     >
       <CCol xs="12">
         <table id="example" class="display nowrap" style="width: 100%">
           <tbody
             v-if="paso.lstIngresos != null && paso.lstIngresos != 'undefined'"
             style="
+              padding-top: 0;
               border-style: solid;
               border-width: 1px;
               border-left: none;
               border-right: none;
+              border-top: none;
               border-color: #d3d0d0;
             "
           >
@@ -124,7 +155,6 @@
 .modal.show .modal-dialog {
   max-width: 60% !important;
 }
-@import '../assets/css/bootstrap.min.css';
 .row {
   padding: 15px;
 }
@@ -152,6 +182,8 @@ export default {
     id_paso: 0,
     opcion: 0,
     modalTramite: false,
+    nombre_tramite: '',
+    nombre_unidad_organizativa: '',
   }),
   components: {
     Header,
@@ -166,6 +198,10 @@ export default {
       ) {
         this.$router.push('/')
       }
+      this.nombre_tramite = Cookies.get('nombre_tramite')
+      this.nombre_unidad_organizativa = Cookies.get(
+        'nombre_unidad_organizativa',
+      )
       const route = useRoute()
       const id = route.params.id
       this.id_paso = id
@@ -196,7 +232,7 @@ export default {
       this.$router.push('/ListaPaso/' + this.paso.id_tramite)
     },
     configura(id) {
-      this.$router.push('/GrillaContenidoPaso/' + id)
+      this.$router.push('/GrillaContenidoPaso/' + id + '/' + this.id_paso)
     },
     async btnSave() {
       try {
@@ -204,26 +240,21 @@ export default {
         this.paso.id_paso = this.id_paso
         InstFormData.append('obj', this.paso)
         if (this.opcion == 1) {
-          await axios
-            .post('/Ingresos_x_paso/insert', { ...this.paso })
-            .then(() =>
-              axios
-                .get('/Paso/getByPk?ID=' + this.id_paso)
-                .then((response) => (this.paso = response.data))(
-                (this.modalTramite = false),
-              ),
-            )
+          await axios.post('/Ingresos_x_paso/insert', { ...this.paso }).then(
+            () => alert('Los cambios se guardaron de forma correcta'),
+            axios
+              .get('/Paso/getByPk?ID=' + this.id_paso)
+              .then((response) => (this.paso = response.data)),
+          )
         } else {
-          await axios
-            .post('/Ingresos_x_paso/update', { ...this.paso })
-            .then(() =>
-              axios
-                .get('/Paso/getByPk?ID=' + this.id_paso)
-                .then((response) => (this.paso = response.data))(
-                (this.modalTramite = false),
-              ),
-            )
+          await axios.post('/Ingresos_x_paso/update', { ...this.paso }).then(
+            () => alert('Los cambios se guardaron de forma correcta'),
+            axios
+              .get('/Paso/getByPk?ID=' + this.id_paso)
+              .then((response) => (this.paso = response.data)),
+          )
         }
+        this.modalTramite = false
       } catch {
         alert('Error')
       }

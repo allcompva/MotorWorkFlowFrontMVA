@@ -89,9 +89,8 @@ export default {
   components: {},
   mounted() {
     if (
-      document.cookie
-        .split(';')
-        .some((item) => item.trim().startsWith('cod_usuario'))
+      Cookies.get('cod_usuario') != null &&
+      Cookies.get('cod_oficina') != null
     ) {
       this.$router.push('/AdminETramite')
     }
@@ -106,21 +105,38 @@ export default {
               '&password=' +
               this.password,
           )
-          .then(
-            (response) => (
-              (this.usuario = response.data),
-              Cookies.set('cod_usuario', response.data.cod_usuario),
-              Cookies.set('nombre', response.data.nombre),
-              Cookies.set('administrador', response.data.administrador),
-              Cookies.set('nombre_completo', response.data.nombre_completo),
-              Cookies.set('cod_oficina', response.data.cod_oficina),
-              Cookies.set('nombre_oficina', response.data.nombre_oficina),
+          .then((response) => {
+            if (response.data != '') {
+              ;(this.usuario = response.data),
+                Cookies.set('cod_usuario', response.data.cod_usuario),
+                Cookies.set('nombre', response.data.nombre),
+                Cookies.set('administrador', response.data.administrador),
+                Cookies.set('nombre_completo', response.data.nombre_completo),
+                Cookies.set('cod_oficina', response.data.cod_oficina),
+                Cookies.set('nombre_oficina', response.data.nombre_oficina),
+                axios
+                  .get(
+                    '/Login/ValidaPermisoConOficina?user=' +
+                      this.user +
+                      '&proceso=ADMIN_ETRAMITES',
+                  )
+                  .then((response) => {
+                    if (response.data != '') {
+                      Cookies.set('admin_tramites', true)
+                    } else {
+                      Cookies.set('admin_tramites', false)
+                    }
+                  })
+                  .catch((this.labelError = true))
               this.$router.push('/AdminETramite')
-            ),
-          )
+            } else {
+              this.labelError = true
+              return
+            }
+          })
           .catch((this.labelError = true))
       } catch (error) {
-        alert(error)
+        console.log(error)
       }
     },
   },

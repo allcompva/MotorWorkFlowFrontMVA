@@ -14,9 +14,17 @@ export default createStore({
       cod_oficina: 0,
       nombre_oficina: '',
       cuit: '',
+      nombre_tramite: '',
+      nombre_unidad_organizativa: '',
     }
   },
   mutations: {
+    setNombreTramite(state, nombre_tramite) {
+      state.nombre_tramite = nombre_tramite
+    },
+    setNombreUnidadOrganizativa(state, nombre_unidad_organizativa) {
+      state.nombre_unidad_organizativa = nombre_unidad_organizativa
+    },
     setCod_usuario(state, cod_usuario) {
       state.cod_usuario = cod_usuario
     },
@@ -37,6 +45,12 @@ export default createStore({
     },
   },
   getters: {
+    getNombreTramite(state) {
+      return state.nombre_tramite
+    },
+    getNombreUnidadOrganizativa(state) {
+      return state.nombre_unidad_organizativa
+    },
     getCod_usuario(state) {
       return state.cod_usuario
     },

@@ -216,7 +216,6 @@
   </div>
 </template>
 <style scoped>
-@import '../../assets/css/bootstrap.min.css';
 .row {
   padding: 15px;
 }

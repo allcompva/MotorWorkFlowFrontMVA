@@ -62,6 +62,12 @@
               <td
                 style="padding-top: 0px; border-top: none; padding-bottom: 0px"
               >
+                <strong
+                  class="text-medium-emphasis"
+                  style="color: #505050 !important"
+                >
+                  {{ item.nombre }}
+                </strong>
                 <p
                   class="text-medium-emphasis"
                   style="
@@ -70,15 +76,7 @@
                     color: #505050 !important;
                   "
                 >
-                  <strong style="color: #505050 !important">{{
-                    item.nombre_unidad_organizativa
-                  }}</strong>
-                </p>
-                <p
-                  class="text-medium-emphasis"
-                  style="color: #505050 !important"
-                >
-                  {{ item.nombre }}
+                  {{ item.nombre_unidad_organizativa }}
                 </p>
               </td>
               <td
@@ -106,10 +104,18 @@
                       @click="abreModalTramite(item)"
                     ></span
                   ></CButton>
-                  <CButton @click="doSomething(item.id)"
+                  <CButton @click="doSomething(item)"
                     ><span class="fa fa-cog"></span
                   ></CButton>
-                  <CButton><span class="fa fa-eye"></span></CButton>
+                  <CButton v-if="item.activo" @click="activaDesactiva(item)"
+                    ><span class="fa fa-eye"></span
+                  ></CButton>
+                  <CButton
+                    v-else
+                    @click="activaDesactiva(item)"
+                    style="background-color: #e7e7e7"
+                    ><span class="fa fa-eye-slash"></span
+                  ></CButton>
                 </CButtonGroup>
               </td>
             </tr>
@@ -159,8 +165,7 @@
     </CModalFooter>
   </CModal>
 </template>
-<style scoped>
-@import '../assets/css/bootstrap.min.css';
+<style>
 .row {
   padding: 15px;
 }
@@ -208,7 +213,7 @@ export default {
       }
 
       axios
-        .get('/Tramite/read')
+        .get('/Tramite/readBack')
         .then((response) => (this.lsTramites = response.data))
       axios
         .get('/Oficinas/read')
@@ -260,8 +265,13 @@ export default {
       }
       this.modalTramite = true
     },
-    doSomething(id) {
-      this.$router.push('/ListaPaso/' + id)
+    doSomething(item) {
+      Cookies.set('nombre_tramite', item.nombre),
+        Cookies.set(
+          'nombre_unidad_organizativa',
+          item.nombre_unidad_organizativa,
+        ),
+        this.$router.push('/ListaPaso/' + item.id)
     },
     async btnSave() {
       try {
@@ -271,25 +281,40 @@ export default {
         this.tramite.id_unidad_organizativa = this.oficinaActual
         InstFormData.append('obj', this.tramite)
         if (this.opcion == 1) {
-          await axios
-            .post('/Tramite/insert', { ...this.tramite })
-            .then(() =>
-              axios
-                .get('/Tramite/read')
-                .then((response) => (this.lsTramites = response.data)),
-            )
+          await axios.post('/Tramite/insert', { ...this.tramite }).then(
+            () => alert('Los cambios se guardaron de forma correcta'),
+            axios
+              .get('/Tramite/readBack')
+              .then((response) => (this.lsTramites = response.data)),
+          )
         } else {
-          await axios
-            .post('/Tramite/update', { ...this.tramite })
-            .then(() =>
-              axios
-                .get('/Tramite/read')
-                .then(
-                  (response) => (this.lsTramites = response.data),
-                  (this.modalTramite = false),
-                ),
-            )
+          await axios.post('/Tramite/update', { ...this.tramite }).then(
+            () => alert('Los cambios se guardaron de forma correcta'),
+            axios
+              .get('/Tramite/readBack')
+              .then(
+                (response) => (this.lsTramites = response.data),
+                (this.modalTramite = false),
+              ),
+          )
         }
+      } catch {
+        alert('Error')
+      }
+    },
+    async activaDesactiva(obj) {
+      try {
+        let InstFormData = new FormData()
+        this.tramite.id = obj.id
+        this.tramite.activo = !obj.activo
+        InstFormData.append('obj', this.tramite)
+        await axios
+          .post('/Tramite/activaDesactiva', { ...this.tramite })
+          .then(() =>
+            axios
+              .get('/Tramite/readBack')
+              .then((response) => (this.lsTramites = response.data)),
+          )
       } catch {
         alert('Error')
       }

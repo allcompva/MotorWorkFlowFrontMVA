@@ -1,4 +1,11 @@
-<template v-if="NombreFormateado != null && NombreFormateado != 'undefined'">
+<template
+  v-if="
+    NombreFormateado != null &&
+    NombreFormateado != 'undefined' &&
+    admin_tramites != null &&
+    admin_tramites != 'undefined'
+  "
+>
   <CHeader position="sticky" class="mb-4 headermuni">
     <CContainer style="padding-left: 25px; padding-right: 25px">
       <CCol xs="3">
@@ -44,7 +51,19 @@
               >{{ NombreFormateado }}</CDropdownToggle
             >
             <CDropdownMenu>
-              <CDropdownItem @click="cerrarsesion">Cerrar Sesion</CDropdownItem>
+              <CDropdownItem @click="misTramites"
+                ><span class="fa fa-list"></span>&nbsp;&nbsp;Mis
+                Tramites</CDropdownItem
+              >
+              <CDropdownItem @click="configurar" v-if="admin_tramites == true"
+                ><span class="fa fa-cog"></span>&nbsp;&nbsp;{{
+                  admin_tramites
+                }}</CDropdownItem
+              >
+              <CDropdownItem @click="cerrarsesion"
+                ><span class="fa fa-sign-out"></span>&nbsp;Cerrar
+                Sesion</CDropdownItem
+              >
             </CDropdownMenu>
           </CDropdown>
         </CHeaderNav>
@@ -71,6 +90,7 @@ export default {
   components: {},
   data: () => ({
     NombreFormateado: '',
+    admin_tramites: false,
   }),
   methods: {
     cerrarsesion() {
@@ -82,10 +102,16 @@ export default {
       Cookies.remove('nombre_oficina')
       this.$router.push('/')
     },
+    misTramites() {
+      this.$router.push('/AdminETramite')
+    },
+    configurar() {
+      this.$router.push('/ListaTramite')
+    },
   },
   mounted() {
     this.NombreFormateado = Cookies.get('nombre_completo')
-    //alert(this.NombreFormateado)
+    this.admin_tramites = Cookies.get('admin_tramites')
   },
 }
 </script>

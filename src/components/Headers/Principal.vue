@@ -67,13 +67,7 @@
     </div>
   </header>
 </template>
-<style scoped>
-@import '../../assets/css/css2.css';
-@import '../../assets/css/bootstrap.min.css';
-@import '../../assets/css/style.css';
-@import '../../assets/css/roofsie.css';
-@import '../../assets/css/roofsie-responsive.css';
-</style>
+
 <script>
 export default {
   data: () => ({}),

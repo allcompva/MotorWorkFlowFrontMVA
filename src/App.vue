@@ -37,3 +37,7 @@ export default {
 // Import Main styles for this application
 @import 'styles/style';
 </style>
+<style>
+@import '../src/assets/css/app.css';
+@import '../src/assets/css/bootstrap.min.css';
+</style>

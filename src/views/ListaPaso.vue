@@ -7,18 +7,51 @@
       style="margin-bottom: 5px; background-color: white; position: relative"
     >
       <CCol xs="12" style="display: contents">
-        <h2>Listado de Pasos</h2>
+        <p
+          style="
+            width: 100%;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 0;
+          "
+        >
+          {{ this.nombre_tramite }}
+        </p>
+        <p
+          style="
+            width: 100%;
+            font-size: 20px;
+            font-weight: 400;
+            margin-bottom: 0;
+          "
+        >
+          {{ this.nombre_unidad_organizativa }}
+        </p>
+        <p style="width: 100%"></p>
+        <hr style="width: 100%; margin-top: 0" />
+        <h2 style="font-size: 24px; color: gray">Listado de Pasos</h2>
         <CButton
           @click="abreModalTramite(null)"
-          style="float: right; right: 25px; position: absolute"
+          style="float: right; right: 140px; position: absolute"
           class="btn btn-primary"
           ><span class="fa fa-plus-circle"></span>&nbsp;&nbsp;Nuevo
           Paso</CButton
         >
+        <CButton
+          @click="salir()"
+          style="float: right; right: 25px; position: absolute"
+          class="btn btn-success"
+          ><span class="fa fa-chevron-left"></span>&nbsp;&nbsp;Salir
+        </CButton>
       </CCol>
     </CRow>
     <CRow
-      style="margin-bottom: 45px; background-color: white; position: relative"
+      style="
+        margin-bottom: 25px;
+        background-color: white;
+        position: relative;
+        padding-top: 0;
+      "
     >
       <CCol xs="12">
         <table id="example" class="display nowrap" style="width: 100%">
@@ -29,6 +62,7 @@
               border-width: 1px;
               border-left: none;
               border-right: none;
+              border-top: none;
               border-color: #d3d0d0;
             "
           >
@@ -94,12 +128,11 @@
                     ></span
                   ></CButton>
                   <CButton
-                    ><span
-                      class="fa fa-cog"
-                      @click="doSomething(item.id)"
-                    ></span
+                    ><span class="fa fa-cog" @click="doSomething(item)"></span
                   ></CButton>
-                  <CButton><span class="fa fa-eye"></span></CButton>
+                  <CButton
+                    ><span class="fa fa-remove" style="color: red"></span
+                  ></CButton>
                 </CButtonGroup>
               </td>
             </tr>
@@ -187,7 +220,6 @@
 .modal.show .modal-dialog {
   max-width: 60% !important;
 }
-@import '../assets/css/bootstrap.min.css';
 .row {
   padding: 15px;
 }
@@ -229,6 +261,8 @@ export default {
     },
     oficinaActual: 0,
     opcion: 0,
+    nombre_tramite: '',
+    nombre_unidad_organizativa: '',
   }),
   components: {
     Header,
@@ -243,6 +277,10 @@ export default {
       ) {
         this.$router.push('/')
       }
+      this.nombre_tramite = Cookies.get('nombre_tramite')
+      this.nombre_unidad_organizativa = Cookies.get(
+        'nombre_unidad_organizativa',
+      )
       const route = useRoute()
       const id = route.params.id
       this.idTramite = id
@@ -306,8 +344,12 @@ export default {
       }
       this.modalTramite = true
     },
-    doSomething(id) {
-      this.$router.push('/EstructuraPaso/' + id)
+    doSomething(item) {
+      Cookies.set('nombre_paso', item.nombre),
+        this.$router.push('/EstructuraPaso/' + item.id)
+    },
+    salir() {
+      this.$router.push('/ListaTramite/')
     },
     async btnSave() {
       try {
@@ -316,25 +358,21 @@ export default {
         if (this.paso.id_oficina == 0) this.paso.en_usuario = true
         InstFormData.append('obj', this.paso)
         if (this.opcion == 1) {
-          await axios
-            .post('/Paso/insert', { ...this.paso })
-            .then(
-              () =>
-                axios
-                  .get('/Paso/readBackEnd?idTramite=' + this.idTramite)
-                  .then((response) => (this.lstPasos = response.data)),
-              (this.modalTramite = false),
-            )
+          await axios.post('/Paso/insert', { ...this.paso }).then(
+            () => alert('Los cambios se guardaron de forma correcta'),
+            axios
+              .get('/Paso/readBackEnd?idTramite=' + this.idTramite)
+              .then((response) => (this.lstPasos = response.data)),
+            (this.modalTramite = false),
+          )
         } else {
-          await axios
-            .post('/Paso/update', { ...this.paso })
-            .then(
-              () =>
-                axios
-                  .get('/Paso/readBackEnd?idTramite=' + this.idTramite)
-                  .then((response) => (this.lstPasos = response.data)),
-              (this.modalTramite = false),
-            )
+          await axios.post('/Paso/update', { ...this.paso }).then(
+            () => alert('Los cambios se guardaron de forma correcta'),
+            axios
+              .get('/Paso/readBackEnd?idTramite=' + this.idTramite)
+              .then((response) => (this.lstPasos = response.data)),
+            (this.modalTramite = false),
+          )
         }
       } catch {
         alert('Error')

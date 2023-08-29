@@ -20,6 +20,11 @@ const routes = [
         component: () => import('@/views/AdminMunicipal/AdminETramite.vue'),
       },
       {
+        path: '/WebServices',
+        name: 'WebServices',
+        component: () => import('@/views/WebServices.vue'),
+      },
+      {
         path: '/ListaTramite',
         name: 'ListaTramite',
         component: () => import('@/views/ListaTramite.vue'),
@@ -30,9 +35,14 @@ const routes = [
         component: () => import('@/views/ListaPaso.vue'),
       },
       {
-        path: '/GrillaContenidoPaso/:id',
+        path: '/GrillaContenidoPaso/:id/:ant',
         name: 'GrillaContenidoPaso',
         component: () => import('@/views/GrillaContenidoPaso.vue'),
+      },
+      {
+        path: '/ConfiguraFormulario/:id/:ant',
+        name: 'ConfiguraFormulario',
+        component: () => import('@/views/ConfiguraFormulario.vue'),
       },
       {
         path: '/EstructuraPaso/:id',
