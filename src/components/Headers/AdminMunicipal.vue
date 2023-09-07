@@ -8,66 +8,68 @@
 >
   <CHeader position="sticky" class="mb-4 headermuni">
     <CContainer style="padding-left: 25px; padding-right: 25px">
-      <CCol xs="3">
-        <CHeaderBrand class="mx-auto" to="/">
-          <a href="/"
-            ><img src="../../assets/logo.png" alt="" style="height: 60px"
-          /></a>
-        </CHeaderBrand>
-      </CCol>
-      <CCol lg="7" xl="7" md="6">
-        <h2 style="font-size: 28px; font-weight: bold; color: dimgray">
-          E-Tramites
-        </h2>
-      </CCol>
-      <CCol
-        lg="3"
-        xl="2"
-        md="3"
-        style="
-          text-align: right;
-          background-color: #2d353a;
-          padding: 5px;
-          border-top-left-radius: 10px;
-          border-bottom-left-radius: 10px;
-          right: 0;
-          position: fixed;
-        "
-      >
-        <CHeaderNav style="display: inline-flex">
-          <span
-            class="fa fa-envelope"
-            style="
-              color: white;
-              align-items: center;
-              display: flex;
-              font-size: 24px;
-              margin-right: 25px;
-            "
-          ></span>
-          <CDropdown>
-            <CDropdownToggle
-              style="background-color: transparent; color: white"
-              >{{ NombreFormateado }}</CDropdownToggle
-            >
-            <CDropdownMenu>
-              <CDropdownItem @click="misTramites"
-                ><span class="fa fa-list"></span>&nbsp;&nbsp;Mis
-                Tramites</CDropdownItem
+      <CRow>
+        <CCol xs="3">
+          <CHeaderBrand class="mx-auto" to="/">
+            <a href="/"
+              ><img src="../../assets/logo.png" alt="" style="height: 60px"
+            /></a>
+          </CHeaderBrand>
+        </CCol>
+        <CCol lg="7" xl="7" md="6">
+          <h2 style="font-size: 28px; font-weight: bold; color: dimgray">
+            E-Tramites
+          </h2>
+        </CCol>
+        <CCol
+          lg="3"
+          xl="2"
+          md="3"
+          style="
+            text-align: right;
+            background-color: #2d353a;
+            padding: 5px;
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+            right: 0;
+            position: fixed;
+          "
+        >
+          <CHeaderNav style="display: inline-flex">
+            <span
+              class="fa fa-envelope"
+              style="
+                color: white;
+                align-items: center;
+                display: flex;
+                font-size: 24px;
+                margin-right: 25px;
+              "
+            ></span>
+            <CDropdown>
+              <CDropdownToggle
+                style="background-color: transparent; color: white"
+                >{{ NombreFormateado }}</CDropdownToggle
               >
-              <CDropdownItem @click="configurar" v-if="admin_tramites == true"
-                ><span class="fa fa-cog"></span>&nbsp;&nbsp;{{
-                  admin_tramites
-                }}</CDropdownItem
-              >
-              <CDropdownItem @click="cerrarsesion"
-                ><span class="fa fa-sign-out"></span>&nbsp;Cerrar
-                Sesion</CDropdownItem
-              >
-            </CDropdownMenu>
-          </CDropdown>
-        </CHeaderNav>
-      </CCol>
+              <CDropdownMenu>
+                <CDropdownItem @click="misTramites"
+                  ><span class="fa fa-list"></span>&nbsp;&nbsp;Mis
+                  Tramites</CDropdownItem
+                >
+                <CDropdownItem @click="configurar" v-if="admin_tramites == true"
+                  ><span class="fa fa-cog"></span>&nbsp;&nbsp;{{
+                    admin_tramites
+                  }}</CDropdownItem
+                >
+                <CDropdownItem @click="cerrarsesion"
+                  ><span class="fa fa-sign-out"></span>&nbsp;Cerrar
+                  Sesion</CDropdownItem
+                >
+              </CDropdownMenu>
+            </CDropdown>
+          </CHeaderNav>
+        </CCol>
+      </CRow>
     </CContainer>
   </CHeader>
 </template>
@@ -84,6 +86,8 @@
 }
 </style>
 <script>
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
 import Cookies from 'js-cookie'
 export default {
   name: 'AppHeader',

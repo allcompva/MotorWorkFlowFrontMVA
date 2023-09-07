@@ -175,6 +175,19 @@
                   @click="aditarAgregarCampo(null, 14, 2)"
                   ><span class="fa fa-chevron-right"></span></CButton
               ></CListGroupItem>
+              <CListGroupItem
+                >Validacion WS<CButton
+                  style="
+                    float: right;
+                    width: 35px;
+                    height: 35px;
+                    font-size: 14px;
+                  "
+                  color="secondary"
+                  variant="outline"
+                  @click="aditarAgregarCampo(null, 16, 2)"
+                  ><span class="fa fa-chevron-right"></span></CButton
+              ></CListGroupItem>
             </CListGroup>
           </template>
         </CCol>
@@ -1028,6 +1041,7 @@ export default {
       }
       this.visibleLiveRow = false
     },
+
     iniciaEliminar(id) {
       this.id_eliminar = id
       this.visibleLiveDelete = true

@@ -54,23 +54,34 @@
         <CButton
           color="primary"
           variant="outline"
-          style="border: solid 1px dimgray"
+          style="border: solid 1px dimgray; font-size: 18px; height: 80px"
           @click="doSomething()"
         >
-          <CIcon :icon="icon.cilChevronCircleLeftAlt" size="xl" />
+          <CIcon :icon="icon.cilChevronCircleLeftAlt" />
           &nbsp;Salir </CButton
         >&nbsp;
         <template v-if="estado == 1 || estado == 5">
-          <CButton color="success" variant="outline" @click="iniciaRecibir">
-            <CIcon :icon="icon.cilThumbUp" size="xl" />&nbsp;Recibir
+          <CButton
+            color="success"
+            variant="outline"
+            style="font-size: 14px; height: 80px"
+            @click="iniciaRecibir"
+          >
+            <CIcon :icon="icon.cilThumbUp" />&nbsp;Recibir
           </CButton>
         </template>
         <template v-if="estado == 2">
-          <CButton color="success" variant="outline" @click="continuar">
-            Continuar &nbsp;<CIcon
+          <CButton
+            color="success"
+            variant="outline"
+            @click="continuar"
+            style="font-size: 16px; height: 80px"
+          >
+            <CIcon
+              style="width: 40px; margin-left: 12px"
               :icon="icon.cilChevronCircleRightAlt"
-              size="xl"
             />
+            &nbsp;Continuar
           </CButton>
         </template>
       </CCol>
@@ -85,40 +96,26 @@
         </h4>
       </CCol>
       <CCol xs="6">
-        <div>
-          <img
-            style="
-              border-radius: 50%;
-              height: 120px;
-              width: 120px;
-              padding: 15px;
-              display: inline;
-            "
-            :src="foto"
-          />
-
-          <div
-            style="
-              display: inline-block;
-              vertical-align: middle;
-              border-left: solid 1px lightgray;
-              padding-left: 10px;
-            "
-          >
-            <h4 style="color: var(--roofsie-gray); font-size: 22px !important">
-              Iniciado por <br />
-              <small style="font-size: 0.7em">{{
-                tramite.nombre_contribuyente
-              }}</small
-              ><br />
-              <small style="font-size: 0.6em">CUIT: {{ tramite.cuit }}</small
-              ><br />
-              <small
-                style="font-size: 0.6em; margin-bottom: 0; padding-bottom: 0"
-                >En representacion de: Si mismo</small
-              >
-            </h4>
-          </div>
+        <div
+          style="
+            display: inline-block;
+            vertical-align: middle;
+            border-left: solid 1px lightgray;
+            padding-left: 10px;
+          "
+        >
+          <h4 style="color: var(--roofsie-gray); font-size: 22px !important">
+            Iniciado por <br />
+            <small style="font-size: 0.7em">{{
+              tramite.nombre_contribuyente
+            }}</small
+            ><br />
+            <small style="font-size: 0.6em">CUIT: {{ tramite.cuit }}</small
+            ><br />
+            <small style="font-size: 0.6em; margin-bottom: 0; padding-bottom: 0"
+              >En representacion de: Si mismo</small
+            >
+          </h4>
         </div>
       </CCol>
     </CRow>
@@ -471,15 +468,20 @@
       </CCol>
     </CRow>
   </div>
-  <CModal
-    :visible="modalAceptarTramite"
-    @close="
-      () => {
-        modalAceptarTramite = false
-      }
-    "
-  >
-    <CModalBody style="text-align: center">
+
+  <VueFinalModal v-model="showModal">
+    <CModalBody
+      style="
+        text-align: center;
+        text-align: center;
+        width: 60%;
+        background-color: white;
+        padding: 50px;
+        margin-top: 100px;
+        margin-left: 25%;
+        border-radius: 15px;
+      "
+    >
       <span
         class="fa fa-info-circle"
         style="
@@ -493,24 +495,39 @@
         ¿Esta seguro de recibir el tramite?
       </p>
       <div style="margin-top: 35px">
-        <CButton
-          color="danger"
-          variant="outline"
-          @click="
-            () => {
-              modalAceptarTramite = false
-            }
-          "
-        >
-          <CIcon :icon="icon.cilThumbDown" size="xl" />
-          &nbsp;Cancelar </CButton
-        >&nbsp;
-        <CButton color="success" variant="outline" @click="Recibir">
-          <CIcon :icon="icon.cilThumbUp" size="xl" />&nbsp;Recibir
-        </CButton>
+        <div v-if="!procesando">
+          <CButton
+            style="font-size: 12px; height: 80px"
+            color="danger"
+            variant="outline"
+            @click="
+              () => {
+                showModal = false
+              }
+            "
+          >
+            <CIcon :icon="icon.cilThumbDown" />
+            &nbsp;Cancelar </CButton
+          >&nbsp;
+
+          <CButton
+            color="success"
+            variant="outline"
+            style="font-size: 14px; height: 80px"
+            @click="Recibir"
+          >
+            <CIcon :icon="icon.cilThumbUp" />&nbsp;Recibir
+          </CButton>
+        </div>
+        <div v-else>
+          <CButton size="xl" disabled>
+            <CSpinner component="span" size="xl" aria-hidden="true" />
+            Procesando solicitud...
+          </CButton>
+        </div>
       </div>
     </CModalBody>
-  </CModal>
+  </VueFinalModal>
 </template>
 <style scoped>
 .row {
@@ -531,6 +548,8 @@ hr {
 @import 'datatables.net-dt';
 </style>
 <script>
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
 import { CIcon } from '@coreui/icons-vue'
 import * as icon from '@coreui/icons'
 import Header from '../../components/Headers/AdminMunicipal.vue'
@@ -538,9 +557,11 @@ import { CButton, CCardBody } from '@coreui/vue-pro'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { useRoute } from 'vue-router'
+import { VueFinalModal } from 'vue-final-modal'
 
 export default {
   data: () => ({
+    procesando: false,
     modalAceptarTramite: false,
     tabPaneActiveKey: 1,
     icon,
@@ -551,8 +572,10 @@ export default {
     estado: 0,
     foto: '',
     arraySinRepetidos: [],
+    showModal: false,
   }),
   components: {
+    VueFinalModal,
     Header,
     CCardBody,
     CIcon,
@@ -598,10 +621,10 @@ export default {
   },
   methods: {
     iniciaRecibir() {
-      this.modalAceptarTramite = true
+      this.showModal = true
     },
     Recibir() {
-      this.modalAceptarTramite = false
+      this.procesando = true
       axios
         .get(
           '/Tramites/recibir?id_tramite=' +
@@ -613,7 +636,11 @@ export default {
             '&cod_usuario=' +
             Cookies.get('cod_usuario'),
         )
-        .then((response) => this.$router.push('/PasosTramite/' + response.data))
+        .then(
+          (response) => this.$router.push('/PasosTramite/' + response.data),
+          (this.showModal = false),
+          (this.procesando = false),
+        )
     },
     doSomething() {
       this.$router.push('/AdminETramite')

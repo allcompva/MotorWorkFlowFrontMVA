@@ -65,6 +65,7 @@ const routes = [
         path: '/PasosTramite/:id',
         name: 'PasosTramite',
         component: () => import('@/views/AdminMunicipal/PasosTramite.vue'),
+        params: true,
       },
     ],
   },

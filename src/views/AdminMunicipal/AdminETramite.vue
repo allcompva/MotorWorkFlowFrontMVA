@@ -219,9 +219,12 @@
 .row {
   padding: 15px;
 }
+
 @import 'datatables.net-dt';
 </style>
 <script>
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
 import Header from '../../components/Headers/AdminMunicipal.vue'
 import 'datatables.net-responsive'
 import avatar1 from '@/assets/images/avatars/1.jpg'
@@ -325,6 +328,7 @@ export default {
     doSomething(id) {
       Cookies.set('id_tramites', id),
         this.$router.push('/VerificaTramite/' + id)
+      //(window.location = '/#/VerificaTramite/' + id)
     },
   },
 }

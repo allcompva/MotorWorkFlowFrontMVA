@@ -433,7 +433,10 @@
             style="border: solid 1px dimgray"
             @click="doSomething()"
           >
-            <CIcon :icon="icon.cilChevronCircleLeftAlt" size="xl" />
+            <CIcon
+              style="width: 40px; margin-left: 12px"
+              :icon="icon.cilChevronCircleLeftAlt"
+            />
             &nbsp;Cancelar </CButton
           >&nbsp;
           <CButton
@@ -441,7 +444,10 @@
             variant="outline"
             @click="iniciaRechazarTramite()"
           >
-            <CIcon :icon="icon.cilThumbDown" size="xl" />
+            <CIcon
+              style="width: 40px; margin-left: 12px"
+              :icon="icon.cilThumbDown"
+            />
             &nbsp;Rechazar </CButton
           >&nbsp;
           <CButton
@@ -449,20 +455,26 @@
             variant="outline"
             @click="iniciaAceptarTramite()"
           >
-            <CIcon :icon="icon.cilThumbUp" size="xl" />&nbsp;Aceptar
+            <CIcon
+              style="width: 40px; margin-left: 12px"
+              :icon="icon.cilThumbUp"
+            />&nbsp;Aceptar
           </CButton>
         </CCol>
       </CRow>
-      <CModal
-        style="margin-top: 150px !important"
-        :visible="modalIniciaAprovar"
-        @close="
-          () => {
-            modalIniciaAprovar = false
-          }
-        "
-      >
-        <CModalBody style="text-align: center">
+      <VueFinalModal v-model="modalIniciaAprovar">
+        <CModalBody
+          style="
+            text-align: center;
+            text-align: center;
+            width: 60%;
+            background-color: white;
+            padding: 50px;
+            margin-top: 100px;
+            margin-left: 25%;
+            border-radius: 15px;
+          "
+        >
           <CIcon
             :icon="icon.cilCheckCircle"
             size="xl"
@@ -500,19 +512,32 @@
             >Aceptar</CButton
           >
         </CModalBody>
-      </CModal>
+      </VueFinalModal>
 
-      <CModal
-        style="margin-top: 150px !important"
-        :visible="modalIniciaRechazar"
-        @close="
-          () => {
-            modalIniciaRechazar = false
-          }
-        "
-      >
-        <CModalBody style="text-align: center">
-          <i class="pi pi-times btn-delete"></i>
+      <VueFinalModal v-model="modalIniciaRechazar">
+        <CModalBody
+          style="
+            text-align: center;
+            text-align: center;
+            width: 60%;
+            background-color: white;
+            padding: 50px;
+            margin-top: 100px;
+            margin-left: 25%;
+            border-radius: 15px;
+          "
+        >
+          <CIcon
+            :icon="icon.cilXCircle"
+            size="xl"
+            style="
+              height: 70px;
+              width: 70px;
+              color: #dc3545;
+              margin-top: 35px;
+              margin-bottom: 15px;
+            "
+          />
           <h3>¿Esta seguro de Rechazar el Tramite?</h3>
           <p style="padding-left: 25%; padding-right: 25%"></p>
           <CButton
@@ -537,11 +562,12 @@
               color: #fff !important;
               background-color: rgb(173 16 41) !important;
               border-color: rgb(173 16 41) !important;
+              margin-top: 25px;
             "
             >Aceptar</CButton
           >
         </CModalBody>
-      </CModal>
+      </VueFinalModal>
     </CForm>
   </div>
 </template>
@@ -580,6 +606,8 @@ body {
 </style>
 
 <script>
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
 import VueMultiselect from 'vue-multiselect'
 import { CIcon } from '@coreui/icons-vue'
 import * as icon from '@coreui/icons'
@@ -587,9 +615,9 @@ import axios from 'axios'
 import { useRoute } from 'vue-router'
 import Header from '../../components/Headers/AdminMunicipal.vue'
 import Cookies from 'js-cookie'
-
+import { VueFinalModal } from 'vue-final-modal'
 export default {
-  components: { VueMultiselect, CIcon, Header },
+  components: { VueMultiselect, CIcon, Header, VueFinalModal },
   data: () => ({
     modalProcesar: false,
     modalQuitarImage: false,
